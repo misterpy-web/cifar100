@@ -37,6 +37,26 @@ CIFAR100_FINE = [
 ]
 
 # -------------------------------------------------------------
+# ÖZEL: Model listeleme sırası (test -> final -> diğerleri)
+# -------------------------------------------------------------
+def _priority_from_name(name: str) -> tuple:
+    """
+    Dosya basename'ine göre öncelik belirler:
+    0: test*  , 1: final*  , 2: diğerleri
+    İkincil anahtar olarak case-insensitive alfabetik sırayı kullanır.
+    """
+    n = name.lower()
+    if n.startswith("test"):
+        return (0, n)
+    if n.startswith("final"):
+        return (1, n)
+    return (2, n)
+
+def _sort_model_paths(paths: List[str]) -> List[str]:
+    """Tam yolları, basename'e bakarak özel öncelik ile sıralar."""
+    return sorted(paths, key=lambda p: _priority_from_name(os.path.basename(p)))
+
+# -------------------------------------------------------------
 # Otomatik model bulma: hem Hugging Face hem de ./models klasöründen
 # -------------------------------------------------------------
 MODELS_DIR = os.environ.get("MODELS_DIR", "models")
@@ -76,7 +96,9 @@ def available_models() -> List[str]:
                 local_names[f] = local_path
             except Exception as e:
                 st.error(f"{f} indirilemedi: {e}")
-    return sorted(local_names.values())
+    #return sorted(local_names.values())
+    paths = list(local_names.values())
+    return _sort_model_paths(paths)
 
 with st.sidebar:
     st.header("📦 Model seçimi")
@@ -202,5 +224,6 @@ for r, (i, p) in enumerate(zip(idxs, vals), start=1):
 
 st.success("Tamamlandı ✅")
 #st.markdown("---")
+
 
 
