@@ -216,14 +216,19 @@ with st.spinner("Tahmin ediliyor..."):
 probs = to_probabilities(model, preds)
 
 idxs, vals = topk_from_probs(probs, topk)
-
+st.subheader(f"🔮 Tahminler (Top-{topk})")
+for r, (i, p) in enumerate(zip(idxs, vals), start=1):
+    name = labels[i] if 0 <= i < len(labels) else f"class_{i}"
+    st.write(f"**{r}. {name}** — %{p*100:.1f}")
+"""
 st.subheader(f"🔮 Tahminler (Top-{topk})")
 for r, (i, p) in enumerate(zip(idxs, vals), start=1):
     name = labels[i] if 0 <= i < len(labels) else f"class_{i}"
     st.write(f"**{r}. {name}** — {p:.3f}")
-
+"""
 st.success("Tamamlandı ✅")
 #st.markdown("---")
+
 
 
 
